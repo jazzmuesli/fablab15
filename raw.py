@@ -1,3 +1,4 @@
+import sys
 import time
 import mraa
 #import numpy
@@ -37,21 +38,23 @@ arx = []
 ary = []
 old_time = 0
 #print (mraa.getVersion())
-f = open('report.csv','w')
-f.write("time,a0.len,a0.mean,a0.sd,a5.len,a5.mean,a5.sd\n")
+f = open('raw.csv','w')
+f.write("time,a0,a5")
+stime = time.time()
+duration = float(sys.argv[1])
+
+i = 0
 try:
     x = mraa.Aio(0)
     y = mraa.Aio(5)
-    while True:
-      if time.time() - old_time > 1:
-        line = str(time.time()) + "," + report(arx) + "," + report(ary)
-        print line
-        f.write(line + "\n")
+    flag = True
+    while flag:
+      line = str(time.time()) + "," + str(x.read()) + "," + str(x.read())
+      f.write(line + "\n")
+      i = i + 1
+      since = time.time() - stime
+      if i % 1000 == 0:
         f.flush()
-        arx = []
-        ary = []
-        old_time = time.time()  
-      arx.append(x.read())
-      ary.append(y.read())
+      flag = since < duration
 except Exception,e: 
   print str(e)
